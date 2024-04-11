@@ -13,11 +13,11 @@ class ExpenseItem extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
         child: Column(
           children: [
-            Text(expense.title),
+            Text(expense.title, style: const TextStyle(fontWeight: FontWeight.w500),),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 10),
               child: Row(children: [
-                Text(expense.price.toStringAsFixed(2)),
+                Text('\$${expense.price.toStringAsFixed(2)}'),
                 const Spacer(),
                 Row(children:[
                   Icon(categoryIcons[expense.category]),

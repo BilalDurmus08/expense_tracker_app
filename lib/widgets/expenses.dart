@@ -27,25 +27,75 @@ class _Expenses extends State<Expenses> {
     ),
   ];
 
-  void _opedAddExpenseOverlay() { //Whit this we opened different page. Trust me it is different !!
+  void _opedAddExpenseOverlay() {
+    //with this we opened different page. Trust me it is different !!
     showModalBottomSheet(
+      isScrollControlled: true,
       context: context,
       builder: (ctx) {
-        return const NewExpense();
+        return NewExpense(
+          addOnList: _addExpenseToList,
+        );
       },
+    );
+  }
+
+  void _addExpenseToList(Expense expense) {
+    setState(() {
+      _registeredExpenses.add(expense);
+    });
+  }
+
+  void _deleteExpenseFromList(Expense expense) {
+    final indexOfExpense = _registeredExpenses.indexOf(expense);
+    setState(() {
+      _registeredExpenses.remove(expense);
+    });
+    ScaffoldMessenger.of(context)
+        .clearSnackBars(); //If we have more than 1 snackBar at stack. This method delete them.
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text('Deleted Expense'),
+        duration: const Duration(seconds: 3),
+        action: SnackBarAction(
+          label: 'Undo',
+          onPressed: () {
+            setState(() {
+              _registeredExpenses.insert(indexOfExpense, expense);
+            });
+          },
+        ),
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    Widget mainContent = const Center(
+      child: Column(children: [
+        SizedBox(
+          height: 350,
+        ),
+        Text('There are no expenses currently. Please add some.')
+      ]),
+    ); //Just Center widget couldn't work. And I used different way to centered my Text Widget.
+    if (_registeredExpenses.isNotEmpty) {
+      mainContent = Expanded(
+          child: ExpensesList(
+        expenses: _registeredExpenses,
+        onDeleteExpense: _deleteExpenseFromList,
+      ));
+    }
+
     return Scaffold(
       appBar: AppBar(title: const Text('Flutter expense tracker'), actions: [
-        IconButton(onPressed: _opedAddExpenseOverlay, icon: const Icon(Icons.add)),
+        IconButton(
+            onPressed: _opedAddExpenseOverlay, icon: const Icon(Icons.add)),
       ]),
       body: Column(
         children: [
           const Text('The Chart'),
-          Expanded(child: ExpensesList(expenses: _registeredExpenses)),
+          mainContent,
         ],
       ),
     );
