@@ -3,6 +3,7 @@ import 'package:expense_tracker/model/expense.dart';
 import 'package:expense_tracker/widgets/expenses_list/expenses_list.dart';
 import 'package:expense_tracker/widgets/new_expense.dart';
 import 'package:expense_tracker/widgets/chart/chart.dart';
+import 'package:flutter/widgets.dart';
 
 class Expenses extends StatefulWidget {
   const Expenses({super.key});
@@ -31,6 +32,7 @@ class _Expenses extends State<Expenses> {
   void _opedAddExpenseOverlay() {
     //with this we opened different page. Trust me it is different !!
     showModalBottomSheet(
+      useSafeArea: true, //With that we avoid error about phone's camera space.
       isScrollControlled: true,
       context: context,
       builder: (ctx) {
@@ -72,6 +74,9 @@ class _Expenses extends State<Expenses> {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context)
+        .size
+        .width; //I took the widht value of the screen.
     Widget mainContent = const Center(
       child: Column(children: [
         SizedBox(
@@ -93,12 +98,19 @@ class _Expenses extends State<Expenses> {
         IconButton(
             onPressed: _opedAddExpenseOverlay, icon: const Icon(Icons.add)),
       ]),
-      body: Column(
-        children: [
-          Chart(expenses: _registeredExpenses),
-          mainContent,
-        ],
-      ),
+      body: width < 600
+          ? Column(
+              children: [
+                Chart(expenses: _registeredExpenses),
+                mainContent,
+              ],
+            )
+          : Row(
+              children: [
+                Expanded(child: Chart(expenses: _registeredExpenses)),
+                Expanded(child: mainContent),
+              ],
+            ),
     );
   }
 }
